@@ -24,7 +24,10 @@
         {{ $slot }}
     </div>
     <!-- Place the first <script> tag in your HTML's <head> -->
-        <script src="https://cdn.tiny.cloud/1/6aujx1sqwo157ot7gbesha78g0qbl2ci3hz6lw4ddt7url4e/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+        <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
+
+
+
         <!-- Place the following <script> and <textarea> tags your HTML's <body> -->
             <script>
                 tinymce.init({
