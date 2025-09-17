@@ -25,30 +25,30 @@ class AdminController extends Controller
         $revisorRequests = User::where('is_revisor', NULL)->get();
         $writerRequests = User::where('is_writer', NULL)->get();
 
-        //$financialData = json_decode($this->httpService->getRequest('http://localhost:8001/financialApp/user-data.php'));
-        
+        // inizializza SEMPRE la variabile, anche se la richiesta fallisce
+        $financialData = [];
+
         try {
             // Effettua la richiesta HTTP
             $response = $this->httpService->getRequest('http://internal.finance:8001/user-data.php');
-            // Controlla se la risposta è vuota o non valida
+
             if (empty($response)) {
                 throw new Exception('La risposta dalla richiesta HTTP è vuota.');
             }
-           
+            
             // Decodifica il JSON
-            $financialData = json_decode($response, true);
+            $decoded = json_decode($response, true);
 
-            // Controlla se ci sono errori nella decodifica del JSON
             if (json_last_error() !== JSON_ERROR_NONE) {
                 throw new Exception('Errore nella decodifica del JSON: ' . json_last_error_msg());
             }
-        
-            // A questo punto, $financialData è un array associativo con i dati finanziari
-            // Puoi procedere con l'elaborazione dei dati
+
+            // Se è tutto ok, assegna ai dati
+            $financialData = $decoded;
+
         } catch (Exception $e) {
-            // Gestisci l'eccezione
-            echo 'Errore: ' . $e->getMessage();
-            // Puoi anche registrare l'errore in un log file o eseguire altre azioni di recupero
+            // Log dell'errore invece di echo (così non rompe la view)
+            Log::error('Errore in AdminController@dashboard: '.$e->getMessage());
         }
         
         return view('admin.dashboard', compact('adminRequests', 'revisorRequests', 'writerRequests','financialData'));

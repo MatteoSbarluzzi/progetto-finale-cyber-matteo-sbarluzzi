@@ -6,6 +6,7 @@
             </div>
         </div>
     </div>
+
     <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-12">
@@ -14,6 +15,7 @@
             </div>
         </div>
     </div>
+
     <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-12">
@@ -22,6 +24,7 @@
             </div>
         </div>
     </div>
+
     <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-12">
@@ -30,7 +33,9 @@
             </div>
         </div>
     </div>
+
     <hr>
+
     <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-12">
@@ -46,6 +51,7 @@
             </div>
         </div>
     </div>
+
     <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-12">
@@ -61,44 +67,65 @@
             </div>
         </div>
     </div>
+
     <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-12">
-                
-                    <h2>Financial Data</h2>
-                    <table class="table table-striped table-hover">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Customer Name</th>
-                                <th>Account Balance</th>
-                                <th>Latest transactions</th>
-                                <th>Credit Card Info</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                          
-                            @foreach($financialData['users'] as $user)
 
+                <h2>Financial Data</h2>
+
+                @php($financeUsers = data_get($financialData, 'users', []))
+
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Customer Name</th>
+                            <th>Account Balance</th>
+                            <th>Latest transactions</th>
+                            <th>Credit Card Info</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (empty($financeUsers))
+                            <tr>
+                                <td colspan="4">Financial service unavailable or no data.</td>
+                            </tr>
+                        @else
+                            @foreach($financeUsers as $user)
                                 <tr>
-                                    <td>{{ $user['username'] }}</td>
-                                    <td>{{ $user['account_balance'] }}</td>
+                                    <td>{{ $user['username'] ?? 'N/A' }}</td>
+                                    <td>{{ isset($user['account_balance']) ? number_format($user['account_balance'], 2) : 'N/A' }}</td>
                                     <td>
-                                        <ul>
-                                            @foreach($user['transactions'] as $transaction)
-                                                <li>{{ $transaction['date'] }}: {{ $transaction['description'] }} ({{ $transaction['amount'] }})</li>
-                                            @endforeach
-                                        </ul>
+                                        @if (!empty($user['transactions']))
+                                            <ul class="mb-0">
+                                                @foreach($user['transactions'] as $transaction)
+                                                    <li>
+                                                        {{ $transaction['date'] ?? '' }}:
+                                                        {{ $transaction['description'] ?? '' }}
+                                                        ({{ $transaction['amount'] ?? '' }})
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @else
+                                            N/A
+                                        @endif
                                     </td>
                                     <td>
-                                        <p>Card number: {{ $user['credit_card']['card_number'] }}</p>
-                                        <p>Expire date: {{ $user['credit_card']['expiry_date'] }}</p>
-                                        <p>CVV: {{ $user['credit_card']['cvv'] }}</p>
+                                        @php($cc = $user['credit_card'] ?? null)
+                                        @if ($cc)
+                                            <p class="mb-0">Card number: {{ $cc['card_number'] ?? 'N/A' }}</p>
+                                            <p class="mb-0">Expire date: {{ $cc['expiry_date'] ?? 'N/A' }}</p>
+                                            <p class="mb-0">CVV: {{ $cc['cvv'] ?? 'N/A' }}</p>
+                                        @else
+                                            N/A
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
-                        </tbody>
-                    </table>
-                
+                        @endif
+                    </tbody>
+                </table>
+
             </div>
         </div>
     </div>
