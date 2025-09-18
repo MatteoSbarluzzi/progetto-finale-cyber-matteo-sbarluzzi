@@ -76,6 +76,15 @@ class ArticleController extends Controller implements HasMiddleware
             $article->tags()->attach($newTag);
         }
 
+        // Audit log: creazione articolo
+        Log::channel('audit')->info('Article created', [
+            'article_id' => $article->id,
+            'title'      => $article->title,
+            'by_user'    => Auth::id(),
+            'ip'         => $request->ip(),
+            'time'       => now()->toIso8601String(),
+        ]);
+
         return redirect(route('homepage'))->with('message', 'Articolo creato con successo');
     }
 
@@ -143,6 +152,15 @@ class ArticleController extends Controller implements HasMiddleware
         }
         $article->tags()->sync($newTags);
 
+        // Audit log: modifica articolo
+        Log::channel('audit')->info('Article updated', [
+            'article_id' => $article->id,
+            'title'      => $article->title,
+            'by_user'    => Auth::id(),
+            'ip'         => $request->ip(),
+            'time'       => now()->toIso8601String(),
+        ]);
+
         return redirect(route('writer.dashboard'))->with('message', 'Articolo modificato con successo');
     }
 
@@ -151,10 +169,21 @@ class ArticleController extends Controller implements HasMiddleware
      */
     public function destroy(Article $article)
     {
+        // Salvataggio delll'ID prima della cancellazione per log affidabile
+        $articleId = $article->id;
+
         foreach ($article->tags as $tag) {
             $article->tags()->detach($tag);
         }
         $article->delete();
+
+        // Audit log: eliminazione articolo
+        Log::channel('audit')->warning('Article deleted', [
+            'article_id' => $articleId,
+            'by_user'    => Auth::id(),
+            'ip'         => request()->ip(),
+            'time'       => now()->toIso8601String(),
+        ]);
         
         return redirect()->back()->with('message', 'Articolo cancellato con successo');
     }

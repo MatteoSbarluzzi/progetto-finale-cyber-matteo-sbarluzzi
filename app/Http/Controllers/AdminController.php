@@ -25,7 +25,7 @@ class AdminController extends Controller
         $revisorRequests = User::where('is_revisor', NULL)->get();
         $writerRequests = User::where('is_writer', NULL)->get();
 
-        // inizializza SEMPRE la variabile, anche se la richiesta fallisce
+        // Inizializza sempre la variabile, anche se la richiesta fallisce
         $financialData = [];
 
         try {
@@ -58,6 +58,16 @@ class AdminController extends Controller
         $user->is_admin = true;
         $user->save();
 
+        // Audit: assegnazione ruolo admin
+        Log::channel('audit')->warning('Role change', [
+            'action'       => 'setAdmin',
+            'target_id'    => $user->id,
+            'target_email' => $user->email,
+            'performed_by' => Auth::id(),
+            'ip'           => request()->ip(),
+            'time'         => now()->toIso8601String(),
+        ]);
+
         return redirect(route('admin.dashboard'))->with('message', "$user->name is now administrator");
     }
 
@@ -65,12 +75,32 @@ class AdminController extends Controller
         $user->is_revisor = true;
         $user->save();
 
+        // Audit: assegnazione ruolo revisor
+        Log::channel('audit')->warning('Role change', [
+            'action'       => 'setRevisor',
+            'target_id'    => $user->id,
+            'target_email' => $user->email,
+            'performed_by' => Auth::id(),
+            'ip'           => request()->ip(),
+            'time'         => now()->toIso8601String(),
+        ]);
+
         return redirect(route('admin.dashboard'))->with('message', "$user->name is now revisor");
     }
 
     public function setWriter(User $user){
         $user->is_writer = true;
         $user->save();
+
+        // Audit: assegnazione ruolo writer
+        Log::channel('audit')->warning('Role change', [
+            'action'       => 'setWriter',
+            'target_id'    => $user->id,
+            'target_email' => $user->email,
+            'performed_by' => Auth::id(),
+            'ip'           => request()->ip(),
+            'time'         => now()->toIso8601String(),
+        ]);
 
         return redirect(route('admin.dashboard'))->with('message', "$user->name is now writer");
     }

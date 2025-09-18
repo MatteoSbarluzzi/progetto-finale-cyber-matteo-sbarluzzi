@@ -7,11 +7,18 @@ use App\Models\Tag;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-// aggiunte per il rate limiting
+// Aggiunte per il rate limiting
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
+
+// Aggiunte per l'audit (eventi auth + log)
+use Illuminate\Support\Facades\Event;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Log;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -54,6 +61,38 @@ class AppServiceProvider extends ServiceProvider
                     ], 429);
                 }),
             ];
+        });
+
+        // Eventi di autenticazione per audit 
+        Event::listen(Login::class, function ($event) {
+            Log::channel('audit')->info('Login', [
+                'user_id' => $event->user->id,
+                'email'   => $event->user->email,
+                'ip'      => request()->ip(),
+                'ua'      => request()->userAgent(),
+                'time'    => now()->toIso8601String(),
+            ]);
+        });
+
+        Event::listen(Logout::class, function ($event) {
+            Log::channel('audit')->info('Logout', [
+                'user_id' => $event->user->id ?? null,
+                'email'   => $event->user->email ?? null,
+                'ip'      => request()->ip(),
+                'ua'      => request()->userAgent(),
+                'time'    => now()->toIso8601String(),
+            ]);
+        });
+
+        Event::listen(Registered::class, function ($event) {
+            $u = $event->user;
+            Log::channel('audit')->info('Registered', [
+                'user_id' => $u->id,
+                'email'   => $u->email,
+                'ip'      => request()->ip(),
+                'ua'      => request()->userAgent(),
+                'time'    => now()->toIso8601String(),
+            ]);
         });
         
     }
