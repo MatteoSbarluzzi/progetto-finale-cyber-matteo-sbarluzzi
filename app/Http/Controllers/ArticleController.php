@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use Mews\Purifier\Facades\Purifier;
+
 
 class ArticleController extends Controller implements HasMiddleware
 {
@@ -56,7 +58,7 @@ class ArticleController extends Controller implements HasMiddleware
         $article = Article::create([
             'title' => $request->title,
             'subtitle' => $request->subtitle,
-            'body' => $request->body,
+            'body' => Purifier::clean($request->body),
             'image' => $request->file('image')->store('public/images'),
             'category_id' => $request->category,
             'user_id' => Auth::user()->id,
@@ -124,7 +126,7 @@ class ArticleController extends Controller implements HasMiddleware
         $article->update([
             'title' => $request->title,
             'subtitle' => $request->subtitle,
-            'body' => $request->body,
+            'body' => Purifier::clean($request->body),
             'category_id' => $request->category,
             'slug' => Str::slug($request->title),
         ]);

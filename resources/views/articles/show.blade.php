@@ -25,7 +25,8 @@
                     </div>
                 </div>
                 <hr>
-                <p>{!!$article->body!!}</p>
+                <p class="article-body" style="white-space: pre-line;">{{ $article->body }}</p>
+
                 @if (Auth::user() && Auth::user()->is_revisor && !$article->is_accepted)
                     <div class="container my-5">
                         <div class="row">
