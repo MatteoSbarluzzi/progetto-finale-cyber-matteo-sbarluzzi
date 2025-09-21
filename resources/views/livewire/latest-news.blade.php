@@ -1,29 +1,34 @@
 <div>
     <h3>Articles suggestions for you, get inspired!</h3>
+
     <form wire:submit="fetchNews">
-        <label for="apiSelect">Breaking news aroud the world</label>
+        <label for="apiSelect">Breaking news around the world</label>
         <div class="d-flex">
-            <select wire:model="selectedApi" id="apiSelect" class="form-select">
+            {{-- Niente URL, solo codici paese --}}
+            <select wire:model="selectedCountry" id="apiSelect" class="form-select">
                 <option value="">Choose country</option>
-                <option value="https://newsapi.org/v2/top-headlines?country=it&apiKey=5fbe92849d5648eabcbe072a1cf91473">NewsAPI - IT</option>
-                <option value="https://newsapi.org/v2/top-headlines?country=gb&apiKey=5fbe92849d5648eabcbe072a1cf91473">NewsAPI - Uk</option>
-                <option value="https://newsapi.org/v2/top-headlines?country=us&apiKey=5fbe92849d5648eabcbe072a1cf91473">NewsAPI - US</option>
+                <option value="it">NewsAPI - IT</option>
+                <option value="gb">NewsAPI - UK</option>
+                <option value="us">NewsAPI - US</option>
             </select>
             <button type="submit" class="btn btn-info">Go</button>
         </div>
     </form>
-    <div>
+
+    <div class="mt-3">
         @if(isset($news['error']))
-            <p>{{ $news['error'] }}</p>
-        @elseif(isset($news['articles']))
+            <p class="text-danger">{{ $news['error'] }}</p>
+        @elseif(isset($news['articles']) && is_array($news['articles']))
             @forelse($news['articles'] as $article)
-                <div class="news-article">
-                    <h4>{{ $article['title'] }}</h4>
-                    <p>{{ $article['description'] }}</p>
-                    <a href="{{ $article['url'] }}" target="_blank">Read more</a>
+                <div class="news-article mb-3 p-2 border rounded">
+                    <h4 class="h6">{{ $article['title'] ?? 'Untitled' }}</h4>
+                    <p>{{ $article['description'] ?? '' }}</p>
+                    @if(!empty($article['url']))
+                        <a href="{{ $article['url'] }}" target="_blank" rel="noopener">Read more</a>
+                    @endif
                 </div>
             @empty
-            <h3>No articles around you</h3>
+                <h3>No articles around you</h3>
             @endforelse
         @endif
     </div>

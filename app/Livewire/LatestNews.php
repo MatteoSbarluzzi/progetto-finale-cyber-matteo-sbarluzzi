@@ -2,33 +2,50 @@
 
 namespace App\Livewire;
 
-use GuzzleHttp\Client;
 use Livewire\Component;
+use Illuminate\Support\Facades\Validator;
 use App\Services\HttpService;
 
 class LatestNews extends Component
 {
-    public $selectedApi;
-    public $news;
-    protected $httpService;
+    // Niente URL dal client
+    public string $selectedCountry = '';
+    public array $news = [];
 
-    public function __construct()
-    {
-        $this->httpService = app(HttpService::class);
-    }
+    // Whitelist di valori accettati dal client
+    private array $allowedCountries = ['it', 'gb', 'us'];
 
     public function fetchNews()
     {
-        if (filter_var($this->selectedApi, FILTER_VALIDATE_URL) === FALSE) {
-            $this->news = 'Invalid URL';
-            return;
-        }
+        // Validazione lato server; accetta solo questi paesi
+        Validator::validate(
+            ['selectedCountry' => $this->selectedCountry],
+            ['selectedCountry' => ['required', 'in:' . implode(',', $this->allowedCountries)]],
+            ['selectedCountry.in' => 'Fonte non valida']
+        );
 
-        $this->news = json_decode($this->httpService->getRequest($this->selectedApi), true);
+        // Costruzione URL solo lato server (chiave letta da .env)
+        $url = sprintf(
+            'https://newsapi.org/v2/top-headlines?country=%s&apiKey=%s',
+            $this->selectedCountry,
+            env('NEWSAPI_KEY')
+        );
 
+        // Chiamata tramite service che fa ulteriori controlli/whitelist host
+        /** @var HttpService $http */
+        $http = app(HttpService::class);
+
+        $raw = $http->getRequest($url);      // può restituire string JSON
+        $data = is_array($raw) ? $raw : json_decode($raw ?? '[]', true);
+
+        $this->news = is_array($data) ? $data : [];
     }
+
     public function render()
     {
-        return view('livewire.latest-news');
+        // Passo la whitelist alla vista (comodo per generare la select)
+        return view('livewire.latest-news', [
+            'allowedCountries' => $this->allowedCountries,
+        ]);
     }
 }
