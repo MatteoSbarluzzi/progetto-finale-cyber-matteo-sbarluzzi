@@ -200,7 +200,7 @@ return [
     ],
 
     'tntsearch' => [
-        'storage'  => storage_path(), 
+        'storage' => env('TNTSEARCH_STORAGE', storage_path('tntsearch')), 
         'fuzziness' => env('TNTSEARCH_FUZZINESS', true),
         'fuzzy' => [
             'prefix_length' => 2,
