@@ -61,3 +61,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update', [ProfileController::class, 'updateVulnerable'])->name('profile.update');
 });
+
+// Clickjacking test routes
+Route::view('/attaccante', 'Clickjacking test.attaccante')->name('attaccante');
+Route::view('/vittima', 'Clickjacking test.vittima')->name('vittima');
+
+
