@@ -9,7 +9,7 @@
         </h4>
         <p class="text-muted mb-4">Clicca il bottone sottostante per eseguere una diagnosi e risolvere.</p>
 
-        <!-- wrapper che prende la dimensione del bottone -->
+        <!-- Wrapper che prende la dimensione del bottone -->
         <div class="position-relative d-inline-block"
              style="width:220px; height:56px;">
           <!-- Bottone visibile: stesse dimensioni del wrapper -->

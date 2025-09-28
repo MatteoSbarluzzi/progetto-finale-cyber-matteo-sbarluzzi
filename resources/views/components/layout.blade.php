@@ -23,12 +23,9 @@
     <div class="min-vh-100">
         {{ $slot }}
     </div>
-    <!-- Place the first <script> tag in your HTML's <head> -->
+    
         <script src="{{ asset('js/tinymce/tinymce.min.js') }}"></script>
 
-
-
-        <!-- Place the following <script> and <textarea> tags your HTML's <body> -->
             <script>
                 tinymce.init({
                     selector: 'textarea',

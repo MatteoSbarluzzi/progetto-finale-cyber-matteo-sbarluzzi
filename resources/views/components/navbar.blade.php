@@ -11,7 +11,9 @@
                 </li>
             @auth
                 <li class="nav-item">
-                    <a class="btn btn-info" href="{{route('articles.create')}}">Write you Article</a>
+                    @can('create', \App\Models\Article::class)
+                        <a class="btn btn-info" href="{{route('articles.create')}}">Write your Article</a>
+                    @endcan
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -19,18 +21,20 @@
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
-                        @if (Auth::user()->is_admin)
+
+                        @can('manageAdminArea', \App\Models\User::class)
                             <li><a class="dropdown-item" href="{{route('admin.dashboard')}}">Admin panel</a></li>
-                        @endif
-                        @if (Auth::user()->is_revisor)
+                        @endcan
+
+                        @can('review', \App\Models\Article::class)
                             <li><a class="dropdown-item" href="{{route('revisor.dashboard')}}">Revisor panel</a></li>
-                        @endif
-                        @if (Auth::user()->is_writer)
+                        @endcan
+
+                        @can('create', \App\Models\Article::class)
                             <li><a class="dropdown-item" href="{{route('writer.dashboard')}}">Writer panel</a></li>
-                        @endif
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+                        @endcan
+
+                        <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); document.querySelector('#form-logout').submit();">Logout</a></li>
                         <form action="{{route('logout')}}" method="POST" id="form-logout" class="d-none">
                             @csrf

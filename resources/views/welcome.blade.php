@@ -3,8 +3,23 @@
         <div class="row justify-content-center" style="height: 50vh">
             <div class="col-12 d-flex flex-column justify-content-around">
                 <h1 class="display-1">The Aulab Post</h1>
-                <a href="{{route('articles.create')}}" class="btn btn-outline-success btn-lg align-self-center p-3" style="width: 50%">Write an amazing article</a>
-                
+
+                @can('create', \App\Models\Article::class)
+                    <a href="{{route('articles.create')}}" class="btn btn-outline-success btn-lg align-self-center p-3" style="width: 50%">
+                        Write an amazing article
+                    </a>
+                @else
+                    @auth
+                        <a href="{{route('careers')}}" class="btn btn-outline-secondary btn-lg align-self-center p-3" style="width: 50%">
+                            Become a writer
+                        </a>
+                    @else
+                        <a href="{{route('login')}}" class="btn btn-outline-secondary btn-lg align-self-center p-3" style="width: 50%">
+                            Sign in to write
+                        </a>
+                    @endauth
+                @endcan
+
                 {{-- Riquadro con bottone --}}
                 <div class="card mt-5 mx-auto shadow" style="max-width: 600px;">
                     <div class="card-body bg-light">
@@ -14,7 +29,6 @@
                     </div>
                 </div>
                 {{-- Fine riquadro --}}
-                
             </div>
         </div>
     </div>

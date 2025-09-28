@@ -2,7 +2,7 @@
 
 use App\Http\Middleware\FrameGuard;
 use App\Http\Middleware\RateLimit;
-use App\Http\Middleware\RejectIpOverLimit; // importazione del middleware
+use App\Http\Middleware\RejectIpOverLimit; 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;

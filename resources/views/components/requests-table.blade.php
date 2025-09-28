@@ -14,32 +14,35 @@
                 <td>{{ $user->name }}</td>
                 <td>{{ $user->email }}</td>
                 <td>
-                    {{-- Sostituiti i vecchi link <a> con form PATCH protetti da CSRF--}}
-                    @switch($role)
-                        @case('admin')
-                            <form action="{{ route('admin.setAdmin', $user) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="btn btn-secondary">Enable {{ $role }}</button>
-                            </form>
-                            @break
+                    @can('assignRole', $user)
+                        @switch($role)
+                            @case('admin')
+                                <form action="{{ route('admin.setAdmin', $user) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn btn-secondary">Enable {{ $role }}</button>
+                                </form>
+                                @break
 
-                        @case('revisor')
-                            <form action="{{ route('admin.setRevisor', $user) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="btn btn-secondary">Enable {{ $role }}</button>
-                            </form>
-                            @break
+                            @case('revisor')
+                                <form action="{{ route('admin.setRevisor', $user) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn btn-secondary">Enable {{ $role }}</button>
+                                </form>
+                                @break
 
-                        @case('writer')
-                            <form action="{{ route('admin.setWriter', $user) }}" method="POST" class="d-inline">
-                                @csrf
-                                @method('PATCH')
-                                <button type="submit" class="btn btn-secondary">Enable {{ $role }}</button>
-                            </form>
-                            @break
-                    @endswitch
+                            @case('writer')
+                                <form action="{{ route('admin.setWriter', $user) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="btn btn-secondary">Enable {{ $role }}</button>
+                                </form>
+                                @break
+                        @endswitch
+                    @else
+                        <span class="text-muted">No permission</span>
+                    @endcan
                 </td>
             </tr>
         @endforeach

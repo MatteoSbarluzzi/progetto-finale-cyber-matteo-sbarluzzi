@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 
 class HttpService
 {
-    // Host consentiti per QUESTA feature (NewsAPI)
+    // Host consentiti per questa feature (NewsAPI)
     private array $allowedHosts = ['newsapi.org'];
 
     // Host bloccati sempre

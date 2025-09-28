@@ -16,35 +16,51 @@
                 <td>{{count($metaInfo->articles)}}</td>
                 @if ($metaType == 'tags')
                     <td>
-                        <form action="{{route('admin.editTag', ['tag' => $metaInfo])}}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <input type="text" value="{{$metaInfo->name}}" name="name" placeholder="Nuovo nome tag" class="form-control w-50 d-inline">
-                            <button type="submit" class="btn btn-secondary">Modifica</button>
-                        </form>
+                        @can('manageAdminArea', \App\Models\User::class)
+                            <form action="{{route('admin.editTag', ['tag' => $metaInfo])}}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <input type="text" value="{{$metaInfo->name}}" name="name" placeholder="Nuovo nome tag" class="form-control w-50 d-inline">
+                                <button type="submit" class="btn btn-secondary">Modifica</button>
+                            </form>
+                        @else
+                            <span class="text-muted">No permission</span>
+                        @endcan
                     </td>
                     <td>
-                        <form action="{{route('admin.deleteTag', ['tag' => $metaInfo])}}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
+                        @can('manageAdminArea', \App\Models\User::class)
+                            <form action="{{route('admin.deleteTag', ['tag' => $metaInfo])}}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        @else
+                            <span class="text-muted">No permission</span>
+                        @endcan
                     </td>
                 @else
                     <td>
-                        <form action="{{route('admin.editCategory', ['category' => $metaInfo])}}" method="POST">
-                            @csrf
-                            @method('PUT')
-                            <input type="text" value="{{$metaInfo->name}}" name="name" placeholder="Nuovo nome categoria" class="form-control w-50 d-inline">
-                            <button type="submit" class="btn btn-secondary">Update</button>
-                        </form>
+                        @can('manageAdminArea', \App\Models\User::class)
+                            <form action="{{route('admin.editCategory', ['category' => $metaInfo])}}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <input type="text" value="{{$metaInfo->name}}" name="name" placeholder="Nuovo nome categoria" class="form-control w-50 d-inline">
+                                <button type="submit" class="btn btn-secondary">Update</button>
+                            </form>
+                        @else
+                            <span class="text-muted">No permission</span>
+                        @endcan
                     </td>
                     <td>
-                        <form action="{{route('admin.deleteCategory', ['category' => $metaInfo])}}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
+                        @can('manageAdminArea', \App\Models\User::class)
+                            <form action="{{route('admin.deleteCategory', ['category' => $metaInfo])}}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        @else
+                            <span class="text-muted">No permission</span>
+                        @endcan
                     </td>
                 @endif
             </tr>

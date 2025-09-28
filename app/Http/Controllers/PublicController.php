@@ -4,24 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Mail\CareerRequestMail;
 use App\Models\Article;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
-class PublicController extends Controller implements HasMiddleware
+class PublicController extends Controller
 {
-    public static function middleware()
+    public function __construct()
     {
-        return [
-            new Middleware('auth', except: ['homepage']),
-        ];
+        // Autenticazione su tutte le azioni tranne la homepage
+        $this->middleware('auth')->except(['homepage']);
     }
 
     public function homepage()
     {
-        $articles = Article::where('is_accepted', true)->orderBy('created_at', 'desc')->take(4)->get();
+        $articles = Article::where('is_accepted', true)
+            ->orderBy('created_at', 'desc')
+            ->take(4)
+            ->get();
+
         return view('welcome', compact('articles'));
     }
 
@@ -33,32 +35,44 @@ class PublicController extends Controller implements HasMiddleware
     public function careersSubmit(Request $request)
     {
         $request->validate([
-            'role' => 'required',
-            'email' => 'required|email',
-            'message' => 'required'
+            'role'    => 'required|in:admin,revisor,writer',
+            'email'   => 'required|email',
+            'message' => 'required',
         ]);
 
-        $user = Auth::user();
-        $role = $request->role;
-        $email = $request->email;
+        $user    = Auth::user();
+        $role    = $request->role;
+        $email   = $request->email;
         $message = $request->message;
-        $info = compact('role', 'email', 'message');
 
-        Mail::to('admin@theaulabpost.it')->send(new CareerRequestMail($info));
-
+        // Evita richieste duplicate tramite policies che già usi nel resto dell’app
         switch ($role) {
             case 'admin':
-                $user->is_admin = NULL;
+                if ($user->can('manageAdminArea', User::class)) {
+                    return back()->with('alert', 'Hai già i permessi da amministratore.');
+                }
+                $user->is_admin = null;
                 break;
+
             case 'revisor':
-                $user->is_revisor = NULL;
+                if ($user->can('review', \App\Models\Article::class)) {
+                    return back()->with('alert', 'Hai già i permessi da revisore.');
+                }
+                $user->is_revisor = null;
                 break;
+
             case 'writer':
-                $user->is_writer = NULL;
+                if ($user->can('create', \App\Models\Article::class)) {
+                    return back()->with('alert', 'Hai già i permessi da writer.');
+                }
+                $user->is_writer = null;
                 break;
         }
 
+        Mail::to('admin@theaulabpost.it')->send(new CareerRequestMail(compact('role','email','message')));
+
         $user->update();
+
         return redirect(route('homepage'))->with('message', 'Mail inviata con successo!');
     }
 }

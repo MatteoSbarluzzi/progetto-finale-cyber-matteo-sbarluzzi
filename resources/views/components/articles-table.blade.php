@@ -16,14 +16,26 @@
                 <td>{{$article->subtitle}}</td>
                 <td>{{$article->user->name}}</td>
                 <td>
-                    @if (is_null($article->is_accepted))
-                        <a href="{{route('articles.show', $article)}}" class="btn btn-secondary">Read</a>
+                    @can('publish', $article)
+                        @if (is_null($article->is_accepted))
+                            <form action="{{route('revisor.acceptArticle', $article)}}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-success">Accept</button>
+                            </form>
+                            <form action="{{route('revisor.rejectArticle', $article)}}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-danger">Reject</button>
+                            </form>
+                            <a href="{{route('articles.show', $article)}}" class="btn btn-secondary">Read</a>
+                        @else
+                            <form action="{{route('revisor.undoArticle', $article)}}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-secondary">Back to review</button>
+                            </form>
+                        @endif
                     @else
-                        <form action="{{route('revisor.undoArticle', $article)}}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-secondary">Back to review</button>
-                        </form>
-                    @endif
+                        <a href="{{route('articles.show', $article)}}" class="btn btn-secondary">Read</a>
+                    @endcan
                 </td>
             </tr>
         @endforeach

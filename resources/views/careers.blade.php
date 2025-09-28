@@ -9,21 +9,22 @@
     <div class="container my-5">
         <div class="row">
             <div class="col-12 col-md-6">
+                @auth
                 <form action="{{route('careers.submit')}}" method="POST" class="card p-5 shadow">
                     @csrf
                     <div class="mb-3">
                         <label for="role" class="form-label">Which job position are you applying for?</label>
                         <select name="role" id="role" class="form-control">
                             <option value="" selected disabled>Select Job position</option>
-                            @if (!Auth::user()->is_admin)
+                            @cannot('manageAdminArea', \App\Models\User::class)
                                 <option value="admin">Administrator</option>
-                            @endif
-                            @if (!Auth::user()->is_revisor)
+                            @endcannot
+                            @cannot('review', \App\Models\Article::class)
                                 <option value="revisor">Revisor</option>
-                            @endif
-                            @if (!Auth::user()->is_writer)
+                            @endcannot
+                            @cannot('create', \App\Models\Article::class)
                                 <option value="writer">Writer</option>
-                            @endif
+                            @endcannot
                         </select>
                         @error('role')
                             <span class="text-danger">{{$message}}</span>
@@ -47,14 +48,17 @@
                         <button type="submit" class="btn btn-outline-secondary">Send</button>
                     </div>
                 </form>
+                @else
+                    <div class="alert alert-info">Please <a href="{{route('login')}}">sign in</a> to apply.</div>
+                @endauth
             </div>
             <div class="col-12 col-md-6 p-5">
                 <h2>Work as administrator</h2>
                 <p>If you choose to be administrator you'll be part of our board, managing every aspect of our business. High responsability!</p>
                 <h2>Work as revisor</h2>
-                <p>f you choose to be revisor you'll be able to get an extra money helping us to care our community, reviewing articles.</p>
+                <p>If you choose to be revisor you'll be able to get an extra money helping us to care our community, reviewing articles.</p>
                 <h2>Work as writer</h2>
-                <p>f you choose to be writer you can unleash your potential and be one of the best writer of our community.</p>
+                <p>If you choose to be writer you can unleash your potential and be one of the best writer of our community.</p>
             </div>
         </div>
     </div>

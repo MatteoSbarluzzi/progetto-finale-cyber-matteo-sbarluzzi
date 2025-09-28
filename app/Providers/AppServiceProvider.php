@@ -7,13 +7,10 @@ use App\Models\Tag;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-// Aggiunte per il rate limiting
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Http\Request;
-
-// Aggiunte per l'audit (eventi auth + log)
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
@@ -22,17 +19,13 @@ use Illuminate\Support\Facades\Log;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-    * Register any application services.
-    */
+    // Register any application services
     public function register(): void
     {
         //
     }
     
-    /**
-    * Bootstrap any application services.
-    */
+    // Bootstrap any application services
     public function boot(): void
     {
 

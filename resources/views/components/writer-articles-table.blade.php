@@ -25,12 +25,18 @@
                 <td>{{$article->created_at->format('d/m/Y')}}</td>
                 <td>
                     <a href="{{route('articles.show', $article)}}" class="btn btn-secondary">Read</a>
-                    <a href="{{route('articles.edit', $article)}}" class="btn btn-warning text-white">Edit</a>
-                    <form action="{{route('articles.destroy', $article)}}" method="POST" class="d-inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
+
+                    @can('update', $article)
+                        <a href="{{route('articles.edit', $article)}}" class="btn btn-warning text-white">Edit</a>
+                    @endcan
+
+                    @can('delete', $article)
+                        <form action="{{route('articles.destroy', $article)}}" method="POST" class="d-inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    @endcan
                 </td>
             </tr>
         @endforeach

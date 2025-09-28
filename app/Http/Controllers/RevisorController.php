@@ -7,29 +7,60 @@ use Illuminate\Http\Request;
 
 class RevisorController extends Controller
 {
-    public function dashboard(){
-        $unrevisionedArticles = Article::where('is_accepted', NULL)->get();
-        $acceptedArticles = Article::where('is_accepted', true)->get();
-        $rejectedArticles = Article::where('is_accepted', false)->get();
-        
+    /**
+     * Dashboard del revisore.
+     * Policy: ArticlePolicy@review (abilità senza target, si passa la classe).
+     */
+    public function dashboard()
+    {
+        $this->authorize('review', Article::class);
+
+        $unrevisionedArticles = Article::whereNull('is_accepted')->get();
+        $acceptedArticles     = Article::where('is_accepted', true)->get();
+        $rejectedArticles     = Article::where('is_accepted', false)->get();
+
         return view('revisor.dashboard', compact('unrevisionedArticles', 'acceptedArticles', 'rejectedArticles'));
     }
 
-    public function acceptArticle(Article $article){
+    /**
+     * Accetta e pubblica un articolo.
+     * Policy: ArticlePolicy@publish (revisor o admin).
+     */
+    public function acceptArticle(Article $article)
+    {
+        $this->authorize('publish', $article);
+
         $article->is_accepted = true;
         $article->save();
+
         return redirect(route('revisor.dashboard'))->with('message', 'Article Published');
     }
 
-    public function rejectArticle(Article $article){
+    /**
+     * Rifiuta un articolo.
+     * Policy: ArticlePolicy@publish (revisor o admin).
+     */
+    public function rejectArticle(Article $article)
+    {
+        $this->authorize('publish', $article);
+
         $article->is_accepted = false;
         $article->save();
+
         return redirect(route('revisor.dashboard'))->with('message', 'Article Declined');
     }
 
-    public function undoArticle(Article $article){
-        $article->is_accepted = NULL;
+    /**
+     * Rimette un articolo in revisione.
+     * Policy: ArticlePolicy@publish (revisor o admin).
+     */
+    public function undoArticle(Article $article)
+    {
+        $this->authorize('publish', $article);
+
+        $article->is_accepted = null;
         $article->save();
+
         return redirect(route('revisor.dashboard'))->with('message', 'Article back to review');
     }
 }
